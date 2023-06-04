@@ -23,4 +23,26 @@ class ApplistDetectorFlutter {
   Future<DetectorResult> magiskApp() async {
     return ApplistDetectorFlutterPlatform.instance.magiskApp();
   }
+
+  Future<DetectorResult> pmCommand({Set<String> packages = const {}}) async {
+    return ApplistDetectorFlutterPlatform.instance
+        .pmCommand(packages: packages);
+  }
+
+  Future<DetectorResult> pmConventionalAPIs(
+      {Set<String> packages = const {}}) async {
+    return ApplistDetectorFlutterPlatform.instance
+        .pmConventionalAPIs(packages: packages);
+  }
+
+  Future<DetectorResult> pmSundryAPIs({Set<String> packages = const {}}) async {
+    return ApplistDetectorFlutterPlatform.instance
+        .pmSundryAPIs(packages: packages);
+  }
+
+  Future<DetectorResult> pmQueryIntentActivities(
+      {Set<String> packages = const {}}) async {
+    return ApplistDetectorFlutterPlatform.instance
+        .pmQueryIntentActivities(packages: packages);
+  }
 }

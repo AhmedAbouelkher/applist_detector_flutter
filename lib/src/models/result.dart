@@ -7,16 +7,21 @@ enum DetectorResultType {
   found,
 }
 
+typedef Details = Map<String, DetectorResultType>;
+
 @immutable
 class DetectorResult {
   final DetectorResultType type;
+  final Details details;
   const DetectorResult({
     required this.type,
+    required this.details,
   });
 
-  factory DetectorResult.fromMap(Map<dynamic, dynamic> map) {
+  factory DetectorResult.fromMap(Map map) {
     return DetectorResult(
       type: parseTypeString(map['type']),
+      details: parseDetailMap(map['details']),
     );
   }
 
@@ -42,4 +47,12 @@ DetectorResultType parseTypeString(String type) {
     "FOUND": DetectorResultType.found,
   };
   return data[type] ?? DetectorResultType.notFound;
+}
+
+Details parseDetailMap(Map<dynamic, dynamic> map) {
+  final detail = <String, DetectorResultType>{};
+  map.forEach((key, value) {
+    detail[key] = parseTypeString(value);
+  });
+  return detail;
 }

@@ -1,4 +1,4 @@
-package com.ahmed.applist_detector_flutter
+package com.ahmed.applist_detector_flutter.library
 
 import android.content.Context
 import android.text.TextUtils

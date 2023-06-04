@@ -1,7 +1,8 @@
 import 'dart:developer';
 
-import 'package:applist_detector_flutter/applist_detector_flutter.dart';
 import 'package:flutter/material.dart';
+
+import 'package:applist_detector_flutter/applist_detector_flutter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,120 +17,90 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _plugin = ApplistDetectorFlutter();
+  bool isLoading = false;
+
+  Map<String, DetectorResult> results = {};
+  Set<String> selected = {};
 
   @override
   void initState() {
     super.initState();
+    _init();
+  }
+
+  void _init() async {
+    results.clear();
+    try {
+      results['Abnormal Environment'] = await _plugin.abnormalEnvironment();
+      results['(Libc) File Detection'] = await _plugin.fileDetection();
+      results['(Syscall) File Detection'] =
+          await _plugin.fileDetection(useSysCall: true);
+      results['Xposed Modules'] = await _plugin.xposedModules();
+      results['Magisk App'] = await _plugin.magiskApp();
+      results['PM Command'] = await _plugin.pmCommand();
+      results['PM Conventional APIs'] = await _plugin.pmConventionalAPIs();
+      results['PM Sundry APIs'] = await _plugin.pmSundryAPIs();
+      results['PM QueryIntentActivities'] =
+          await _plugin.pmQueryIntentActivities();
+    } catch (e, t) {
+      log("ERROR Init", error: e, stackTrace: t);
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('ApplistDetectorFlutter example'),
+          elevation: 0,
+          actions: [
+            IconButton(
+              onPressed: () {
+                setState(() => isLoading = true);
+                _init();
+              },
+              icon: const Icon(Icons.refresh),
+            ),
+          ],
         ),
         body: SafeArea(
           child: Builder(
             builder: (context) {
-              return Center(
+              if (isLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return SingleChildScrollView(
+                padding: const EdgeInsets.only(top: 20, bottom: 40),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          final result = await _plugin.abnormalEnvironment();
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(result.type.name),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          log("Error checking environment: $e");
-                          return;
+                    ExpansionPanelList(
+                      expansionCallback: (index, isExpanded) {
+                        final key = results.keys.elementAt(index);
+                        if (isExpanded) {
+                          selected.remove(key);
+                        } else {
+                          selected.add(key);
                         }
+
+                        if (mounted) setState(() {});
                       },
-                      child: const Text("Check Abnormal Environment"),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          final result = await _plugin.fileDetection();
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(result.type.name),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          log("Error checking file detection: $e");
-                          return;
-                        }
-                      },
-                      child: const Text("Check File Detection"),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          final result =
-                              await _plugin.fileDetection(useSysCall: true);
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(result.type.name),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          log("Error checking file detection with syscall: $e");
-                          return;
-                        }
-                      },
-                      child: const Text("Check File Detection (Syscall)"),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          final result = await _plugin.xposedModules();
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(result.type.name),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          log("Error checking xposed modules: $e");
-                          return;
-                        }
-                      },
-                      child: const Text("Check Xposed Modules"),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          final result = await _plugin.magiskApp();
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(result.type.name),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          log("Error checking magisk app: $e");
-                          return;
-                        }
-                      },
-                      child: const Text("Check Magisk App"),
+                      children: results.entries
+                          .map(
+                            (e) => buildExpPanel(e.value,
+                                testName: e.key,
+                                isExpanded: selected.contains(e.key)),
+                          )
+                          .toList(),
                     ),
                   ],
                 ),
@@ -140,4 +111,52 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+const Map<DetectorResultType, Widget> icons = {
+  DetectorResultType.notFound: Icon(Icons.done),
+  DetectorResultType.found: Icon(Icons.coronavirus, color: Colors.red),
+  DetectorResultType.suspicious: Icon(Icons.visibility),
+  DetectorResultType.methodUnavailable: Icon(Icons.code_off),
+};
+
+const Map<DetectorResultType, String> labels = {
+  DetectorResultType.notFound: "Not Found",
+  DetectorResultType.found: "Found",
+  DetectorResultType.suspicious: "Suspicious",
+  DetectorResultType.methodUnavailable: "Method Unavailable",
+};
+
+ExpansionPanel buildExpPanel(
+  DetectorResult result, {
+  required String testName,
+  bool isExpanded = false,
+}) {
+  final details = result.details;
+  return ExpansionPanel(
+    isExpanded: isExpanded,
+    headerBuilder: (context, isExpanded) {
+      return ListTile(
+        leading: icons[result.type],
+        title: Text(testName),
+      );
+    },
+    body: Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+      ).add(const EdgeInsets.only(bottom: 15)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: details.entries.map((e) {
+          return Row(
+            children: [
+              icons[e.value]!,
+              const SizedBox(width: 10),
+              Expanded(child: Text(e.key)),
+            ],
+          );
+        }).toList(),
+      ),
+    ),
+  );
 }

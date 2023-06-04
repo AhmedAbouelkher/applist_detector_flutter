@@ -7,5 +7,6 @@ const kDefaultPackages = <String>{
   "top.canyie.dreamland.manager",
   "me.weishu.exp",
   "com.android.vendinf",
-  "moe.shizuku.redirectstorage"
+  "moe.shizuku.redirectstorage",
+  "oa.ozpydwju.g.utax"
 };

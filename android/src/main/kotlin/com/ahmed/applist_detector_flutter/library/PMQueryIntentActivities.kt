@@ -1,11 +1,13 @@
-package com.ahmed.applist_detector_flutter
+package com.ahmed.applist_detector_flutter.library
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 
-class PMConventionalAPIs(context: Context) : IDetector(context) {
+class PMQueryIntentActivities(context: Context) : IDetector(context) {
 
-    override val name = "PM Conventional APIs"
+    override val name = "PM Intent Queries"
 
     @SuppressLint("QueryPermissionsNeeded")
     override fun run(packages: Collection<String>?, detail: Detail?): Result {
@@ -13,8 +15,10 @@ class PMConventionalAPIs(context: Context) : IDetector(context) {
 
         var result = Result.NOT_FOUND
         val list = mutableSetOf<String>()
-        context.packageManager.getInstalledPackages(0).forEach { list.add(it.packageName) }
-        context.packageManager.getInstalledApplications(0).forEach { list.add(it.packageName) }
+
+        val intent = Intent(Intent.ACTION_MAIN)
+        for (pkg in context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL))
+            list.add(pkg.activityInfo.packageName)
         if (list.size == 0) result = Result.METHOD_UNAVAILABLE
         if (list.size == 1) result = Result.SUSPICIOUS
 

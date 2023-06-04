@@ -1,7 +1,8 @@
 package com.ahmed.applist_detector_flutter
 
 import android.content.Context
-import androidx.annotation.NonNull
+import android.util.Log
+import com.ahmed.applist_detector_flutter.library.*
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -20,12 +21,20 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.applicationContext
-        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "applist_detector_flutter")
+        channel = MethodChannel(
+            flutterPluginBinding.binaryMessenger,
+            "com.ahmed/applist_detector_flutter"
+        )
         channel.setMethodCallHandler(this)
 
-        System.loadLibrary("applist_detector")
-
-        TODO("Handle Exceptions for loading the library")
+        try {
+            System.loadLibrary("applist_detector")
+        } catch (e: Exception) {
+            Log.e("ApplistDetectorFlutterPlugin", "Failed to load applist_detector library", e)
+            val data = HashMap<String, Any>()
+            data["error"] = e.message ?: "Unknown error"
+            channel.invokeMethod("native_library_load_failed", data)
+        }
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -46,12 +55,32 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             }
 
             "xposed_modules" -> {
-                checkXposedModules(call, result)
+                checkXposedModules(result)
                 return
             }
 
             "magisk_app" -> {
-                checkMagiskApp(call, result)
+                checkMagiskApp(result)
+                return
+            }
+
+            "pm_command" -> {
+                checkPMCommand(call, result)
+                return
+            }
+
+            "pm_conventional_apis" -> {
+                checkConventionalAPIS(call, result)
+                return
+            }
+
+            "pm_sundry_apis" -> {
+                checkSundryAPIS(call, result)
+                return
+            }
+
+            "pm_query_intent_activities" -> {
+                checkPMQueryIntentActivities(call, result)
                 return
             }
 
@@ -67,8 +96,9 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             val dtc = AbnormalEnvironment(context)
             val r = dtc.run(emptyList, detail)
 
-            val data = HashMap<String, String>()
+            val data = HashMap<String, Any>()
             data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
             result.success(data)
         } catch (e: Exception) {
             result.error("ABNORMAL_ENV_CHECK_FAILED", e.message, null)
@@ -89,40 +119,132 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             val dtc = FileDetection(context, useSysCall)
             val r = dtc.run(packages, detail)
 
-            val data = HashMap<String, String>()
+            val data = HashMap<String, Any>()
             data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
             result.success(data)
         } catch (e: Exception) {
             result.error("FILE_DETECTION_FAILED", e.message, null)
         }
     }
 
-    private fun checkXposedModules(call: MethodCall, result: Result) {
+    private fun checkXposedModules(result: Result) {
         val detail = mutableListOf<Pair<String, IDetector.Result>>()
 
         try {
             val dtc = XposedModules(context)
             val r = dtc.run(null, detail)
 
-            val data = HashMap<String, String>()
+            val data = HashMap<String, Any>()
             data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
             result.success(data)
         } catch (e: Exception) {
             result.error("XPOSED_DETECTION_FAILED", e.message, null)
         }
     }
 
-    private fun checkMagiskApp(call: MethodCall, result: Result) {
+    private fun checkMagiskApp(result: Result) {
         val detail = mutableListOf<Pair<String, IDetector.Result>>()
         try {
             val dtc = MagiskApp(context)
             val r = dtc.run(null, detail)
 
-            val data = HashMap<String, String>()
+            val data = HashMap<String, Any>()
             data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
             result.success(data)
         } catch (e: Exception) {
             result.error("MAGISK_DETECTION_FAILED", e.message, null)
         }
     }
+
+    private fun checkPMCommand(call: MethodCall, result: Result) {
+        val detail = mutableListOf<Pair<String, IDetector.Result>>()
+
+        val packages = call.argument<List<String>>("packages") ?: emptyList()
+        if (packages.isEmpty()) {
+            result.error("CHECK_PM_COMMAND_FAILED", "No packages to check", null)
+            return
+        }
+
+        try {
+            val dtc = PMCommand(context)
+            val r = dtc.run(packages, detail)
+
+            val data = HashMap<String, Any>()
+            data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
+            result.success(data)
+        } catch (e: Exception) {
+            result.error("CHECK_PM_COMMAND_FAILED", e.message, null)
+        }
+    }
+
+    private fun checkConventionalAPIS(call: MethodCall, result: Result) {
+        val detail = mutableListOf<Pair<String, IDetector.Result>>()
+
+        val packages = call.argument<List<String>>("packages") ?: emptyList()
+        if (packages.isEmpty()) {
+            result.error("CHECK_PM_CONVENTIONAL_APIS_FAILED", "No packages to check", null)
+            return
+        }
+
+        try {
+            val dtc = PMConventionalAPIs(context)
+            val r = dtc.run(packages, detail)
+
+            val data = HashMap<String, Any>()
+            data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
+            result.success(data)
+        } catch (e: Exception) {
+            result.error("CHECK_PM_CONVENTIONAL_APIS_FAILED", "No packages to check", null)
+        }
+    }
+
+    private fun checkSundryAPIS(call: MethodCall, result: Result) {
+        val detail = mutableListOf<Pair<String, IDetector.Result>>()
+
+        val packages = call.argument<List<String>>("packages") ?: emptyList()
+        if (packages.isEmpty()) {
+            result.error("CHECK_PM_SUNDRY_APIS_FAILED", "No packages to check", null)
+            return
+        }
+
+        try {
+            val dtc = PMSundryAPIs(context)
+            val r = dtc.run(packages, detail)
+
+            val data = HashMap<String, Any>()
+            data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
+            result.success(data)
+        } catch (e: Exception) {
+            result.error("CHECK_PM_SUNDRY_APIS_FAILED", "No packages to check", null)
+        }
+    }
+
+    private fun checkPMQueryIntentActivities(call: MethodCall, result: Result) {
+        val detail = mutableListOf<Pair<String, IDetector.Result>>()
+
+        val packages = call.argument<List<String>>("packages") ?: emptyList()
+        if (packages.isEmpty()) {
+            result.error("CHECK_PM_QUERY_INTENT_ACTIVITIES", "No packages to check", null)
+            return
+        }
+
+        try {
+            val dtc = PMQueryIntentActivities(context)
+            val r = dtc.run(packages, detail)
+
+            val data = HashMap<String, Any>()
+            data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
+            result.success(data)
+        } catch (e: Exception) {
+            result.error("CHECK_PM_QUERY_INTENT_ACTIVITIES", "No packages to check", null)
+        }
+    }
+
 }

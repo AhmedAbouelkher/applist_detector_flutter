@@ -8,7 +8,7 @@ static int xposed_status = NO_XPOSED;
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_ahmed_applist_1detector_1flutter_AbnormalEnvironment_detectXposed(JNIEnv* env, jobject thiz) {
+Java_com_ahmed_applist_1detector_1flutter_library_AbnormalEnvironment_detectXposed(JNIEnv* env, jobject thiz) {
     int res = get_xposed_status(env, android_get_device_api_level());
     if (res > xposed_status) xposed_status = res;
     return xposed_status != NO_XPOSED;
@@ -16,7 +16,7 @@ Java_com_ahmed_applist_1detector_1flutter_AbnormalEnvironment_detectXposed(JNIEn
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_com_ahmed_applist_1detector_1flutter_AbnormalEnvironment_detectDual(JNIEnv* env, jobject thiz) {
+Java_com_ahmed_applist_1detector_1flutter_library_AbnormalEnvironment_detectDual(JNIEnv* env, jobject thiz) {
     char buf[PATH_MAX], path[PATH_MAX];
     FILE* fp = fopen("/proc/self/maps", "r");
     jboolean found = false;

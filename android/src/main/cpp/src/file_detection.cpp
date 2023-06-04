@@ -37,7 +37,7 @@ void FileDetection(const char* path, jboolean useSyscall) {
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_ahmed_applist_1detector_1flutter_FileDetection_nativeDetect(JNIEnv* env, jclass, jstring path, jboolean useSyscall) {
+Java_com_ahmed_applist_1detector_1flutter_library_FileDetection_nativeDetect(JNIEnv* env, jclass, jstring path, jboolean useSyscall) {
     const char* cpath = env->GetStringUTFChars(path, nullptr);
     FileDetection(cpath, useSyscall);
     env->ReleaseStringUTFChars(path, cpath);

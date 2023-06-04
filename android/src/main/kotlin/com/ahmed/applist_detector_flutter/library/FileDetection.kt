@@ -1,4 +1,4 @@
-package com.ahmed.applist_detector_flutter
+package com.ahmed.applist_detector_flutter.library
 
 import android.annotation.SuppressLint
 import android.content.Context
