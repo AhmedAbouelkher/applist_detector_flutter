@@ -16,8 +16,8 @@ class ApplistDetectorFlutter {
     );
   }
 
-  Future<DetectorResult> xposedModules() async {
-    return ApplistDetectorFlutterPlatform.instance.xposedModules();
+  Future<DetectorResult> xposedModules({bool lspatch =false}) async {
+    return ApplistDetectorFlutterPlatform.instance.xposedModules(lspatch: lspatch);
   }
 
   Future<DetectorResult> magiskApp() async {

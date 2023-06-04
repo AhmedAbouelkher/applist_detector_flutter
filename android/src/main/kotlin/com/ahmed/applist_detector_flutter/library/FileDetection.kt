@@ -24,6 +24,8 @@ class FileDetection(context: Context, private val useSyscall: Boolean) : IDetect
             val res = maxOf(
                 Result.NOT_FOUND,
                 detect("/data/data/$packageName", useSyscall),
+                detect("/data/user_de/0/$packageName", useSyscall),
+                detect("/data/misc/profiles/ref/$packageName", useSyscall),
                 detect("/storage/emulated/0/Android/data/$packageName", useSyscall),
                 detect("/storage/emulated/0/Android/media/$packageName", useSyscall),
                 detect("/storage/emulated/0/Android/obb/$packageName", useSyscall)

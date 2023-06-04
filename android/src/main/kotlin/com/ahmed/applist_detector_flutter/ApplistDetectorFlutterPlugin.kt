@@ -33,7 +33,7 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             Log.e("ApplistDetectorFlutterPlugin", "Failed to load applist_detector library", e)
             val data = HashMap<String, Any>()
             data["error"] = e.message ?: "Unknown error"
-            channel.invokeMethod("native_library_load_failed", data)
+            channel.invokeMethod("native_library_load_failed_callback", data)
         }
     }
 
@@ -55,7 +55,7 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             }
 
             "xposed_modules" -> {
-                checkXposedModules(result)
+                checkXposedModules(call, result)
                 return
             }
 
@@ -128,11 +128,11 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun checkXposedModules(result: Result) {
+    private fun checkXposedModules(call: MethodCall, result: Result) {
         val detail = mutableListOf<Pair<String, IDetector.Result>>()
-
+        val lspatch = call.argument<Boolean>("lspatch") ?: false
         try {
-            val dtc = XposedModules(context)
+            val dtc = XposedModules(context, lspatch)
             val r = dtc.run(null, detail)
 
             val data = HashMap<String, Any>()

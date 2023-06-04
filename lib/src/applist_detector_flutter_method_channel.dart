@@ -10,7 +10,8 @@ class MethodChannelApplistDetectorFlutter
     extends ApplistDetectorFlutterPlatform {
   /// The method channel used to interact with the native platform.
   @visibleForTesting
-  final methodChannel = const MethodChannel('com.ahmed/applist_detector_flutter');
+  final methodChannel =
+      const MethodChannel('com.ahmed/applist_detector_flutter');
 
   @override
   Future<DetectorResult> abnormalEnvironment() async {
@@ -48,8 +49,10 @@ class MethodChannelApplistDetectorFlutter
   }
 
   @override
-  Future<DetectorResult> xposedModules() async {
-    final result = await methodChannel.invokeMethod<Map>('xposed_modules');
+  Future<DetectorResult> xposedModules({bool lspatch = false}) async {
+    final result = await methodChannel.invokeMethod<Map>('xposed_modules', {
+      'lspatch': lspatch,
+    });
     if (result == null) {
       throw PlatformException(
         code: "NULL_RESULT",

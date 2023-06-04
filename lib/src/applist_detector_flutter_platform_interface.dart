@@ -54,7 +54,7 @@ abstract class ApplistDetectorFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('fileDetection() has not been implemented.');
   }
 
-  Future<DetectorResult> xposedModules() {
+  Future<DetectorResult> xposedModules({bool lspatch = false}) {
     throw UnimplementedError('xposedModules() has not been implemented.');
   }
 

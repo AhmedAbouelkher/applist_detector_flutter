@@ -14,24 +14,6 @@ Java_com_ahmed_applist_1detector_1flutter_library_AbnormalEnvironment_detectXpos
     return xposed_status != NO_XPOSED;
 }
 
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_ahmed_applist_1detector_1flutter_library_AbnormalEnvironment_detectDual(JNIEnv* env, jobject thiz) {
-    char buf[PATH_MAX], path[PATH_MAX];
-    FILE* fp = fopen("/proc/self/maps", "r");
-    jboolean found = false;
-    while (fgets(buf, sizeof(buf), fp)) {
-        sscanf(buf, "%*x-%*x %*4c %*x %*x:%*x %*lu %s", path);
-        auto sv = std::string_view(path);
-        if (sv.starts_with("/data/user/") && !sv.starts_with("/data/user/0/")) {
-            found = true;
-            break;
-        }
-    }
-    fclose(fp);
-    return found;
-}
-
 jint JNI_OnLoad(JavaVM* jvm, void*) {
     JNIEnv* env;
     if (jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {

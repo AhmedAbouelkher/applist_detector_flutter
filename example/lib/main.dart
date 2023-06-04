@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:applist_detector_flutter/applist_detector_flutter.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -32,10 +30,12 @@ class _MyAppState extends State<MyApp> {
     results.clear();
     try {
       results['Abnormal Environment'] = await _plugin.abnormalEnvironment();
-      results['(Libc) File Detection'] = await _plugin.fileDetection();
-      results['(Syscall) File Detection'] =
+      results['Libc File Detection'] = await _plugin.fileDetection();
+      results['Syscall File Detection'] =
           await _plugin.fileDetection(useSysCall: true);
       results['Xposed Modules'] = await _plugin.xposedModules();
+      results['lspatch Xposed Modules'] =
+          await _plugin.xposedModules(lspatch: true);
       results['Magisk App'] = await _plugin.magiskApp();
       results['PM Command'] = await _plugin.pmCommand();
       results['PM Conventional APIs'] = await _plugin.pmConventionalAPIs();
