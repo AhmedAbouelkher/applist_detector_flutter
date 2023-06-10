@@ -3,21 +3,19 @@ package com.ahmed.applist_detector_flutter
 import android.content.Context
 import android.util.Log
 import com.ahmed.applist_detector_flutter.library.*
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import java.lang.Exception
+
+// tag
+private const val TAG = "ApplistDetectorFlutterPlugin"
 
 /** ApplistDetectorFlutterPlugin */
 class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
-
-    private var emptyList = listOf<String>()
-
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.applicationContext
@@ -30,7 +28,7 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
         try {
             System.loadLibrary("applist_detector")
         } catch (e: Exception) {
-            Log.e("ApplistDetectorFlutterPlugin", "Failed to load applist_detector library", e)
+            Log.e(TAG, "Failed to load applist_detector library", e)
             val data = HashMap<String, Any>()
             data["error"] = e.message ?: "Unknown error"
             channel.invokeMethod("native_library_load_failed_callback", data)
@@ -84,6 +82,16 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
                 return
             }
 
+            "settings_props" -> {
+                checkSettingsProps(call, result)
+                return
+            }
+
+            "emulator_check" -> {
+                checkEmulator(call, result)
+                return
+            }
+
             else -> {
                 result.notImplemented()
             }
@@ -94,7 +102,7 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
         val detail = mutableListOf<Pair<String, IDetector.Result>>()
         try {
             val dtc = AbnormalEnvironment(context)
-            val r = dtc.run(emptyList, detail)
+            val r = dtc.run(null, detail)
 
             val data = HashMap<String, Any>()
             data["type"] = r.toString()
@@ -244,6 +252,37 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             result.success(data)
         } catch (e: Exception) {
             result.error("CHECK_PM_QUERY_INTENT_ACTIVITIES", "No packages to check", null)
+        }
+    }
+
+    private fun checkSettingsProps(call: MethodCall, result: Result) {
+        val detail = mutableListOf<Pair<String, IDetector.Result>>()
+        try {
+            val dtc = SettingsProps(context)
+            val r = dtc.run(null, detail)
+
+            val data = HashMap<String, Any>()
+            data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
+            result.success(data)
+        } catch (e: Exception) {
+            result.error("CHECK_SETTINGS_PROPS_FAILED", e.message, null)
+        }
+    }
+
+
+    private fun checkEmulator(call: MethodCall, result: Result) {
+        val detail = mutableListOf<Pair<String, IDetector.Result>>()
+        try {
+            val dtc = EmulatorCheck(context)
+            val r = dtc.run(null, detail)
+
+            val data = HashMap<String, Any>()
+            data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
+            result.success(data)
+        } catch (e: Exception) {
+            result.error("CHECK_EMULATOR_FAILED", e.message, null)
         }
     }
 

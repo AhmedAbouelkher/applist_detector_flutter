@@ -16,8 +16,9 @@ class ApplistDetectorFlutter {
     );
   }
 
-  Future<DetectorResult> xposedModules({bool lspatch =false}) async {
-    return ApplistDetectorFlutterPlatform.instance.xposedModules(lspatch: lspatch);
+  Future<DetectorResult> xposedModules({bool lspatch = false}) async {
+    return ApplistDetectorFlutterPlatform.instance
+        .xposedModules(lspatch: lspatch);
   }
 
   Future<DetectorResult> magiskApp() async {
@@ -44,5 +45,13 @@ class ApplistDetectorFlutter {
       {Set<String> packages = const {}}) async {
     return ApplistDetectorFlutterPlatform.instance
         .pmQueryIntentActivities(packages: packages);
+  }
+
+  Future<DetectorResult> settingsProps() {
+    return ApplistDetectorFlutterPlatform.instance.settingsProps();
+  }
+
+  Future<DetectorResult> emulatorCheck() {
+    return ApplistDetectorFlutterPlatform.instance.emulatorCheck();
   }
 }

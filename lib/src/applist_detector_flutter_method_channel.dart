@@ -131,4 +131,28 @@ class MethodChannelApplistDetectorFlutter
     }
     return DetectorResult.fromMap(result);
   }
+
+  @override
+  Future<DetectorResult> settingsProps() async {
+    final result = await methodChannel.invokeMethod<Map>('settings_props');
+    if (result == null) {
+      throw PlatformException(
+        code: "NULL_RESULT",
+        message: "Checking settings props failed.",
+      );
+    }
+    return DetectorResult.fromMap(result);
+  }
+
+  @override
+  Future<DetectorResult> emulatorCheck() async {
+    final result = await methodChannel.invokeMethod<Map>('emulator_check');
+    if (result == null) {
+      throw PlatformException(
+        code: "NULL_RESULT",
+        message: "Checking emulator check failed.",
+      );
+    }
+    return DetectorResult.fromMap(result);
+  }
 }

@@ -20,9 +20,11 @@ class XposedModules(context: Context, private val lspatch: Boolean = false) : ID
         var meta = "";
         var meta2 = ""
         if (lspatch) {
-            meta = "lspatch";meta2 = "jshook"
+            meta = "lspatch"
+            meta2 = "jshook"
         } else {
-            meta = "xposedminversion";meta2 = "xposeddescription"
+            meta = "xposedminversion"
+            meta2 = "xposeddescription"
         }
         for (pkg in intent) {
             if (pkg.metaData?.get(meta) != null || pkg.metaData?.get(meta2) != null) {

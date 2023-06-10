@@ -13,9 +13,11 @@ fun Detail.toHashMap(): HashMap<String, String> {
 }
 
 abstract class IDetector(protected val context: Context) {
-
     enum class Result {
-        NOT_FOUND, METHOD_UNAVAILABLE, SUSPICIOUS, FOUND
+        NOT_FOUND,
+        METHOD_UNAVAILABLE,
+        SUSPICIOUS,
+        FOUND
     }
 
     abstract val name: String

@@ -61,4 +61,13 @@ abstract class ApplistDetectorFlutterPlatform extends PlatformInterface {
   Future<DetectorResult> magiskApp() {
     throw UnimplementedError('magiskApp() has not been implemented.');
   }
+
+  Future<DetectorResult> settingsProps() {
+    throw UnimplementedError(
+        'isDeveloperModeEnabled() has not been implemented.');
+  }
+
+  Future<DetectorResult> emulatorCheck() {
+    throw UnimplementedError('isEmulator() has not been implemented.');
+  }
 }

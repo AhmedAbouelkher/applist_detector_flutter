@@ -1,12 +1,53 @@
 package com.ahmed.applist_detector_flutter.library
 
 import android.content.Context
+import java.io.BufferedReader
+import java.io.FileInputStream
+import java.io.InputStreamReader
 
 class AbnormalEnvironment(context: Context) : IDetector(context) {
-
-    private val maps_string = false
-
     override val name = "Abnormal Environment"
+
+    private fun checkProcSelfMaps(): Boolean {
+        var susMapsString = false
+        try {
+            val ret = StringBuilder()
+            val smapsFile = FileInputStream("/proc/self/smaps")
+            val mapsFile = FileInputStream("/proc/self/maps")
+            val files = listOf(smapsFile, mapsFile)
+            for (f in files) {
+                lateinit var reader: InputStreamReader
+                lateinit var bufReader: BufferedReader
+                try {
+                    reader = InputStreamReader(f, Charsets.UTF_8)
+                    bufReader = BufferedReader(reader)
+
+                    while (true) {
+                        val line = bufReader.readLine() ?: break
+                        val l = line.split("/", "_", "-").toString()
+                        if (l.contains(".magisk", ignoreCase = true)
+                            || (l.contains("riru", ignoreCase = true)
+                                    || (l.contains("zygisk", ignoreCase = true)))
+                        ) {
+                            ret.append(l).append('\n')
+                        }
+                    }
+                } catch (e: Exception) {
+                    // do nothing
+                } finally {
+                    bufReader.close()
+                    reader.close()
+                }
+
+                susMapsString = ret.isNotEmpty()
+            }
+            smapsFile.close()
+            mapsFile.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return susMapsString
+    }
 
     private external fun detectXposed(): Boolean
 
@@ -25,6 +66,10 @@ class AbnormalEnvironment(context: Context) : IDetector(context) {
     }
 
     override fun run(packages: Collection<String>?, detail: Detail?): Result {
+        if (packages != null) throw IllegalArgumentException("packages should be null")
+
+        val susSelfMaps = checkProcSelfMaps()
+
         var result = Result.NOT_FOUND
         val add: (Pair<String, Result>) -> Unit = {
             result = result.coerceAtLeast(it.second)
@@ -46,7 +91,7 @@ class AbnormalEnvironment(context: Context) : IDetector(context) {
         add(
             Pair(
                 "Magisk/Riru/Zygisk Maps Scan",
-                if (maps_string) Result.FOUND else Result.NOT_FOUND
+                if (susSelfMaps) Result.FOUND else Result.NOT_FOUND
             )
         )
         var sufilenum = 0
@@ -93,4 +138,6 @@ class AbnormalEnvironment(context: Context) : IDetector(context) {
         )
         return result
     }
+
+
 }

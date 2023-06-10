@@ -20,8 +20,8 @@ class DetectorResult {
 
   factory DetectorResult.fromMap(Map map) {
     return DetectorResult(
-      type: parseTypeString(map['type']),
-      details: parseDetailMap(map['details']),
+      type: _parseTypeString(map['type']),
+      details: _parseDetailMap(map['details']),
     );
   }
 
@@ -39,7 +39,7 @@ class DetectorResult {
   int get hashCode => type.hashCode;
 }
 
-DetectorResultType parseTypeString(String type) {
+DetectorResultType _parseTypeString(String type) {
   final data = {
     "NOT_FOUND": DetectorResultType.notFound,
     "METHOD_UNAVAILABLE": DetectorResultType.methodUnavailable,
@@ -49,10 +49,10 @@ DetectorResultType parseTypeString(String type) {
   return data[type] ?? DetectorResultType.notFound;
 }
 
-Details parseDetailMap(Map<dynamic, dynamic> map) {
+Details _parseDetailMap(Map<dynamic, dynamic> map) {
   final detail = <String, DetectorResultType>{};
   map.forEach((key, value) {
-    detail[key] = parseTypeString(value);
+    detail[key] = _parseTypeString(value);
   });
   return detail;
 }
