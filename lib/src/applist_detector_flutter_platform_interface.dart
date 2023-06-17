@@ -1,7 +1,9 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'applist_detector_flutter_method_channel.dart';
-import 'models/result.dart';
+import 'models/models.dart';
+
+typedef PlayIntegrityUriBuilder = Uri Function(String token);
 
 abstract class ApplistDetectorFlutterPlatform extends PlatformInterface {
   /// Constructs a ApplistDetectorFlutterPlatform.
@@ -69,5 +71,11 @@ abstract class ApplistDetectorFlutterPlatform extends PlatformInterface {
 
   Future<DetectorResult> emulatorCheck() {
     throw UnimplementedError('isEmulator() has not been implemented.');
+  }
+
+  Future<PlayIntegrityResponse> checkPlayIntegrityApi(
+      {required PlayIntegrityUriBuilder uriBuilder}) {
+    throw UnimplementedError(
+        'checkPlayIntegrityApi() has not been implemented.');
   }
 }

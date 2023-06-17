@@ -45,6 +45,7 @@ class SettingsProps(context: Context) : IDetector(context) {
                 || getValueFromProp("sys.usb.state").contains("adb")
                 || getValueFromProp("sys.usb.config").contains("adb")
                 || getValueFromProp("persist.sys.usb.reboot.funnc").contains("adb")
+                || getValueFromProp("init.svc.adbd").contains("running")
     }
 
     override fun run(packages: Collection<String>?, detail: Detail?): Result {

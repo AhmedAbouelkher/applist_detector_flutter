@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 import 'applist_detector_flutter_platform_interface.dart';
-import 'models/result.dart';
 import 'default_packages.dart';
+import 'exceptions/exceptions.dart';
+import 'models/models.dart';
 
 /// An implementation of [ApplistDetectorFlutterPlatform] that uses method channels.
 class MethodChannelApplistDetectorFlutter
@@ -154,5 +156,64 @@ class MethodChannelApplistDetectorFlutter
       );
     }
     return DetectorResult.fromMap(result);
+  }
+
+  @override
+  Future<PlayIntegrityResponse> checkPlayIntegrityApi(
+      {required PlayIntegrityUriBuilder uriBuilder}) async {
+    late String token;
+
+    try {
+      final result =
+          await methodChannel.invokeMethod<Map>('integrity_api_check');
+      if (result == null) {
+        throw PlatformException(
+          code: "NULL_RESULT",
+          message: "Checking play integrity api failed.",
+        );
+      }
+      token = result['token'] ?? '';
+    } on PlatformException catch (e) {
+      final code = e.code;
+
+      if (code == "INTEGRITY_API_EXCEPTION") {
+        final details = e.details as Map;
+
+        throw PlayIntegrityException(
+          e.message ?? "Checking play integrity api failed.",
+          details['error_code'] ??
+              -100, // default error code: IntegrityErrorCode.internalError
+        );
+      }
+
+      rethrow;
+    }
+
+    if (token == '') {
+      throw PlatformException(
+        code: "EMPTY_ATTACHED_TOKEN",
+        message: "Checking play integrity api failed.",
+      );
+    }
+
+    final uri = uriBuilder(token);
+    final response = await http.get(uri);
+    if (response.statusCode != 200) {
+      throw PlatformException(
+        code: "INVALID_RESPONSE",
+        message: "Checking play integrity api failed.",
+        details: PlayIntegrityResponse(
+          statusCode: response.statusCode,
+          body: response.body,
+          headers: response.headers,
+        ),
+      );
+    }
+
+    return PlayIntegrityResponse(
+      statusCode: response.statusCode,
+      body: response.body,
+      headers: response.headers,
+    );
   }
 }

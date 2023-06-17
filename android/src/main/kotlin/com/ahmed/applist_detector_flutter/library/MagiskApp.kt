@@ -5,7 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.util.Log
 import java.io.File
+import java.io.IOException
+import java.io.InputStream
 
 class MagiskApp(context: Context) : IDetector(context) {
 
@@ -17,8 +20,8 @@ class MagiskApp(context: Context) : IDetector(context) {
             PackageManager.GET_PERMISSIONS
 
     private val stubInfo by lazy {
-        val archive = context.cacheDir.resolve("stub.apk")
-        context.assets.open("stub.apk").use { input ->
+        val archive = context.cacheDir.resolve("stub-release.apk")
+        context.assets.open("stub-release.apk").use { input ->
             archive.outputStream().use { output ->
                 input.copyTo(output)
             }
@@ -33,6 +36,9 @@ class MagiskApp(context: Context) : IDetector(context) {
         var result = Result.NOT_FOUND
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN)
+
+        Log.e("MagiskApp", stubInfo.packageName)
+
         for (pkg in pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)) {
             runCatching {
                 val pInfo = pm.getPackageInfo(pkg.activityInfo.packageName, flags)

@@ -16,7 +16,7 @@ class EmulatorCheck(context: Context) : IDetector(context) {
                 || Build.FINGERPRINT.startsWith("unknown")
                 || Build.HARDWARE.contains("goldfish")
                 || Build.HARDWARE.contains("ranchu")
-                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("google_sdk ")
                 || Build.MODEL.contains("Emulator")
                 || Build.MODEL.contains("Android SDK built for x86")
                 || Build.MANUFACTURER.contains("Genymotion")

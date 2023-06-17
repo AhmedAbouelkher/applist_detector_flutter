@@ -1,5 +1,5 @@
 import 'applist_detector_flutter_platform_interface.dart';
-import 'models/result.dart';
+import 'models/models.dart';
 
 class ApplistDetectorFlutter {
   Future<DetectorResult> abnormalEnvironment() async {
@@ -53,5 +53,11 @@ class ApplistDetectorFlutter {
 
   Future<DetectorResult> emulatorCheck() {
     return ApplistDetectorFlutterPlatform.instance.emulatorCheck();
+  }
+
+  Future<PlayIntegrityResponse> checkPlayIntegrityApi(
+      {required PlayIntegrityUriBuilder uriBuilder}) {
+    return ApplistDetectorFlutterPlatform.instance
+        .checkPlayIntegrityApi(uriBuilder: uriBuilder);
   }
 }

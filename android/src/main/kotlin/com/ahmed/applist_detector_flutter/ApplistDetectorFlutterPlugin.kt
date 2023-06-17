@@ -3,6 +3,7 @@ package com.ahmed.applist_detector_flutter
 import android.content.Context
 import android.util.Log
 import com.ahmed.applist_detector_flutter.library.*
+import com.ahmed.applist_detector_flutter.play_integrity.PlayIntegrity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -29,8 +30,9 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             System.loadLibrary("applist_detector")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load applist_detector library", e)
-            val data = HashMap<String, Any>()
-            data["error"] = e.message ?: "Unknown error"
+            val data = hashMapOf(
+                "error" to (e.message ?: "Unknown error")
+            )
             channel.invokeMethod("native_library_load_failed_callback", data)
         }
     }
@@ -89,6 +91,11 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
             "emulator_check" -> {
                 checkEmulator(call, result)
+                return
+            }
+
+            "integrity_api_check" -> {
+                integrityApiCheck(call, result)
                 return
             }
 
@@ -270,7 +277,6 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-
     private fun checkEmulator(call: MethodCall, result: Result) {
         val detail = mutableListOf<Pair<String, IDetector.Result>>()
         try {
@@ -286,4 +292,21 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
+    private fun integrityApiCheck(call: MethodCall, result: Result) {
+        val integrity = PlayIntegrity(context)
+
+        try {
+            integrity.execute { token, e ->
+                if (e != null) {
+                    val data = hashMapOf("error_code" to e.errorCode)
+                    result.error("INTEGRITY_API_EXCEPTION", e.message, data)
+                    return@execute
+                }
+                val data = hashMapOf("token" to token)
+                result.success(data)
+            }
+        } catch (e: Exception) {
+            result.error("INTEGRITY_API_FAILED", e.message, null)
+        }
+    }
 }

@@ -1,19 +1,41 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:applist_detector_flutter/applist_detector_flutter.dart';
 import 'package:flutter/material.dart';
+
+import 'package:applist_detector_flutter/applist_detector_flutter.dart';
+import './utils.dart';
 
 void main() => runApp(const MyApp());
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Applist Detector Flutter',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: lightColorScheme,
+      ),
+      darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
+        colorScheme: darkColorScheme,
+      ),
+      home: const HomeScreen(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final _plugin = ApplistDetectorFlutter();
   bool isLoading = false;
 
@@ -43,7 +65,7 @@ class _MyAppState extends State<MyApp> {
         buildWrapper("Xposed Modules", process: () {
           return _plugin.xposedModules();
         }),
-        buildWrapper("lspatch Xposed Modules", process: () {
+        buildWrapper("LS Patch Xposed Modules", process: () {
           return _plugin.xposedModules(lspatch: true);
         }),
         buildWrapper("Magisk App", process: () {
@@ -82,69 +104,82 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.dark(useMaterial3: true),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('ApplistDetectorFlutter'),
-          elevation: 0,
-          actions: [
-            IconButton(
-              onPressed: () {
-                setState(() => isLoading = true);
-                _startTests();
-              },
-              icon: const Icon(Icons.refresh),
-            ),
-          ],
-        ),
-        body: SafeArea(
-          child: Builder(
-            builder: (context) {
-              if (isLoading) {
-                return const Center(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Applist Detector Flutter'),
+        elevation: 0,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() => isLoading = true);
+          _startTests();
+        },
+        child: const Icon(Icons.refresh),
+      ),
+      body: SafeArea(
+        child: Builder(
+          builder: (context) {
+            if (isLoading) {
+              return const SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: Center(
                   child: CircularProgressIndicator(),
-                );
-              }
-              return SingleChildScrollView(
-                padding: const EdgeInsets.only(top: 10, bottom: 40),
-                child: Column(
-                  children: [
-                    if (results.isEmpty) ...[
-                      const SizedBox(
-                        height: 200,
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    ],
-                    ExpansionPanelList(
-                      dividerColor: Colors.grey.shade700,
-                      expansionCallback: (index, isExpanded) {
-                        final item = results[index];
-                        if (isExpanded) {
-                          selected.remove(item);
-                        } else {
-                          selected.add(item);
-                        }
-                        if (mounted) {
-                          setState(() {});
-                        }
-                      },
-                      children: results.map((e) {
-                        final isExpanded = selected.contains(e);
-                        return buildExpPanel(
-                          e,
-                          testName: e.testName,
-                          isExpanded: isExpanded,
-                        );
-                      }).toList(),
-                    ),
-                  ],
                 ),
               );
-            },
-          ),
+            }
+            return ListView(
+              children: [
+                Wrap(
+                  runSpacing: 10,
+                  spacing: 5,
+                  children: DetectorResultType.values.map((type) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(width: 10),
+                        icons[type] ?? const SizedBox.shrink(),
+                        const SizedBox(width: 5),
+                        Text(labels[type] ?? "-"),
+                      ],
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 10),
+                if (results.isEmpty) ...[
+                  const SizedBox.square(
+                    dimension: 50,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                ],
+                ExpansionPanelList(
+                  dividerColor: Colors.transparent,
+                  expansionCallback: (index, isExpanded) {
+                    final item = results[index];
+                    if (isExpanded) {
+                      selected.remove(item);
+                    } else {
+                      selected.add(item);
+                    }
+                    if (mounted) {
+                      setState(() {});
+                    }
+                  },
+                  children: results.map((e) {
+                    final isExpanded = selected.contains(e);
+                    return buildExpPanel(
+                      e,
+                      testName: e.testName,
+                      isExpanded: isExpanded,
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 80)
+              ],
+            );
+          },
         ),
       ),
     );
@@ -176,7 +211,9 @@ class _MyAppState extends State<MyApp> {
       isExpanded: isExpanded,
       headerBuilder: (context, isExpanded) {
         return ListTile(
-          leading: icons[type],
+          leading: error != null
+              ? const Icon(Icons.error, color: Colors.red)
+              : icons[type],
           title: Text(testName),
           trailing: Text(error != null ? "ERROR" : ""),
           subtitle: Text(labels[type] ?? "Unknown"),
@@ -208,52 +245,6 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class ResultWrapper {
-  final String testName;
-  final DetectorResult result;
-  final Object? error;
-  final StackTrace? stackTrace;
-  ResultWrapper({
-    required this.testName,
-    this.result = const DetectorResult(
-      type: DetectorResultType.notFound,
-      details: {},
-    ),
-    this.error,
-    this.stackTrace,
-  });
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is ResultWrapper && other.testName == testName;
-  }
-
-  @override
-  int get hashCode {
-    return testName.hashCode;
-  }
-}
-
-Future<ResultWrapper> buildWrapper(
-  String name, {
-  required FutureOr<DetectorResult> Function() process,
-}) async {
-  try {
-    final result = await process();
-    return ResultWrapper(
-      testName: name,
-      result: result,
-    );
-  } catch (e, t) {
-    return ResultWrapper(
-      testName: name,
-      error: e,
-      stackTrace: t,
     );
   }
 }

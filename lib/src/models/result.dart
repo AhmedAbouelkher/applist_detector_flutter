@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show immutable;
 
 enum DetectorResultType {
   notFound,
@@ -28,6 +28,24 @@ class DetectorResult {
   @override
   String toString() => 'DetectorResult(type: $type)';
 
+  static DetectorResultType _parseTypeString(String type) {
+    final data = {
+      "NOT_FOUND": DetectorResultType.notFound,
+      "METHOD_UNAVAILABLE": DetectorResultType.methodUnavailable,
+      "SUSPICIOUS": DetectorResultType.suspicious,
+      "FOUND": DetectorResultType.found,
+    };
+    return data[type] ?? DetectorResultType.notFound;
+  }
+
+  static Details _parseDetailMap(Map<dynamic, dynamic> map) {
+    final detail = <String, DetectorResultType>{};
+    map.forEach((key, value) {
+      detail[key] = _parseTypeString(value);
+    });
+    return detail;
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -37,22 +55,4 @@ class DetectorResult {
 
   @override
   int get hashCode => type.hashCode;
-}
-
-DetectorResultType _parseTypeString(String type) {
-  final data = {
-    "NOT_FOUND": DetectorResultType.notFound,
-    "METHOD_UNAVAILABLE": DetectorResultType.methodUnavailable,
-    "SUSPICIOUS": DetectorResultType.suspicious,
-    "FOUND": DetectorResultType.found,
-  };
-  return data[type] ?? DetectorResultType.notFound;
-}
-
-Details _parseDetailMap(Map<dynamic, dynamic> map) {
-  final detail = <String, DetectorResultType>{};
-  map.forEach((key, value) {
-    detail[key] = _parseTypeString(value);
-  });
-  return detail;
 }

@@ -69,6 +69,8 @@ android {
     dependencies {
         implementation("com.android.tools.build:apkzlib:7.2.2")
         implementation("io.github.vvb2060.ndk:xposeddetector:2.2")
+        implementation('com.google.android.play:integrity:1.1.0')
+        implementation('com.google.android.gms:play-services-base:18.2.0')
     }
 }
 
