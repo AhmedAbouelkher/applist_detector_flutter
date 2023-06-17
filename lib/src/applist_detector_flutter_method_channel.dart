@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 
 import 'applist_detector_flutter_platform_interface.dart';
 import 'default_packages.dart';
@@ -36,10 +35,7 @@ class MethodChannelApplistDetectorFlutter
     final pkgs = packages.isEmpty ? kDefaultPackages : packages;
     final result = await methodChannel.invokeMethod<Map>(
       'file_detection',
-      {
-        'packages': pkgs.toList(),
-        'use_syscall': useSysCall,
-      },
+      {'packages': pkgs.toList(), 'use_syscall': useSysCall},
     );
     if (result == null) {
       throw PlatformException(
@@ -52,9 +48,8 @@ class MethodChannelApplistDetectorFlutter
 
   @override
   Future<DetectorResult> xposedModules({bool lspatch = false}) async {
-    final result = await methodChannel.invokeMethod<Map>('xposed_modules', {
-      'lspatch': lspatch,
-    });
+    final result = await methodChannel
+        .invokeMethod<Map>('xposed_modules', {'lspatch': lspatch});
     if (result == null) {
       throw PlatformException(
         code: "NULL_RESULT",
@@ -159,13 +154,17 @@ class MethodChannelApplistDetectorFlutter
   }
 
   @override
-  Future<PlayIntegrityResponse> checkPlayIntegrityApi(
-      {required PlayIntegrityUriBuilder uriBuilder}) async {
+  Future<String> checkPlayIntegrityApi(String nonce) async {
+    assert(
+      nonce.length >= 16 && nonce.length <= 500,
+      "Nonce length must be between 16 and 500 characters. (inclusive)",
+    );
+
     late String token;
 
     try {
-      final result =
-          await methodChannel.invokeMethod<Map>('integrity_api_check');
+      final result = await methodChannel
+          .invokeMethod<Map>('integrity_api_check', {'nonce_string': nonce});
       if (result == null) {
         throw PlatformException(
           code: "NULL_RESULT",
@@ -196,24 +195,6 @@ class MethodChannelApplistDetectorFlutter
       );
     }
 
-    final uri = uriBuilder(token);
-    final response = await http.get(uri);
-    if (response.statusCode != 200) {
-      throw PlatformException(
-        code: "INVALID_RESPONSE",
-        message: "Checking play integrity api failed.",
-        details: PlayIntegrityResponse(
-          statusCode: response.statusCode,
-          body: response.body,
-          headers: response.headers,
-        ),
-      );
-    }
-
-    return PlayIntegrityResponse(
-      statusCode: response.statusCode,
-      body: response.body,
-      headers: response.headers,
-    );
+    return token;
   }
 }

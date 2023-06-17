@@ -15,16 +15,6 @@ class PlayIntegrity(private val context: Context) {
         return status == com.google.android.gms.common.ConnectionResult.SUCCESS
     }
 
-    private fun generateNonce(): String {
-        val length = 50
-        var nonce = ""
-        val allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        for (i in 0 until length) {
-            nonce += allowed[floor(Math.random() * allowed.length).toInt()].toString()
-        }
-        return nonce
-    }
-
     private fun parseErrMsg(msg: String): Int {
         return msg.replace("\n".toRegex(), "")
             .replace(":(.*)".toRegex(), "")
@@ -49,6 +39,7 @@ class PlayIntegrity(private val context: Context) {
             IntegrityErrorCode.PLAY_STORE_NOT_FOUND -> "No Play Store app is found on device or not official version is installed. This app can't work without Play Store."
             IntegrityErrorCode.TOO_MANY_REQUESTS -> "The calling app is making too many requests to the API and hence is throttled. This shouldn't happen. If it does please open an issue on Github."
             IntegrityErrorCode.CLOUD_PROJECT_NUMBER_IS_INVALID -> "Use the cloud project number which can be found in Project info in your Google Cloud Console for the cloud project where Play Integrity API is enabled."
+            IntegrityErrorCode.CLIENT_TRANSIENT_ERROR -> "Transient error has occurred on the client device."
             else -> "Unknown Error Code"
         }
     }
@@ -61,14 +52,13 @@ class PlayIntegrity(private val context: Context) {
         return PlayIntegrityException(errMsg, errorCode)
     }
 
-    fun execute(callback: (String?, PlayIntegrityException?) -> Unit) {
+    fun execute(nonce: String, callback: (String?, PlayIntegrityException?) -> Unit) {
         val isGoogleServicesAvailable = isGoogleServicesAvailable()
         if (!isGoogleServicesAvailable) {
             callback(null, PlayIntegrityException("Google Play Services is not available", -66))
             return
         }
 
-        val nonce = generateNonce()
         val manager = IntegrityManagerFactory.create(context)
 
         val response =

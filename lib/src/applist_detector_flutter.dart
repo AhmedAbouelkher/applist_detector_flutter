@@ -55,9 +55,7 @@ class ApplistDetectorFlutter {
     return ApplistDetectorFlutterPlatform.instance.emulatorCheck();
   }
 
-  Future<PlayIntegrityResponse> checkPlayIntegrityApi(
-      {required PlayIntegrityUriBuilder uriBuilder}) {
-    return ApplistDetectorFlutterPlatform.instance
-        .checkPlayIntegrityApi(uriBuilder: uriBuilder);
+  Future<String> checkPlayIntegrityApi(String nonce) {
+    return ApplistDetectorFlutterPlatform.instance.checkPlayIntegrityApi(nonce);
   }
 }

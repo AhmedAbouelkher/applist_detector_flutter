@@ -295,8 +295,10 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
     private fun integrityApiCheck(call: MethodCall, result: Result) {
         val integrity = PlayIntegrity(context)
 
+        val nonce = call.argument<String>("nonce_string") ?: ""
+
         try {
-            integrity.execute { token, e ->
+            integrity.execute(nonce) { token, e ->
                 if (e != null) {
                     val data = hashMapOf("error_code" to e.errorCode)
                     result.error("INTEGRITY_API_EXCEPTION", e.message, data)

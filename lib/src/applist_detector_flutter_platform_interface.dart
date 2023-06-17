@@ -73,8 +73,7 @@ abstract class ApplistDetectorFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('isEmulator() has not been implemented.');
   }
 
-  Future<PlayIntegrityResponse> checkPlayIntegrityApi(
-      {required PlayIntegrityUriBuilder uriBuilder}) {
+  Future<String> checkPlayIntegrityApi(String nonce) {
     throw UnimplementedError(
         'checkPlayIntegrityApi() has not been implemented.');
   }

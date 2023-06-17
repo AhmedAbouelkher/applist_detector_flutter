@@ -1,8 +1,6 @@
 # Applist Detector Flutter
 
-A Flutter ported library to detect suspicious apps like Magisk manager, Xposed framework, Abnormal Environment, running emulator and much more. Written in Kotlin and Dart ❤️.
-
-**This is not an officially supported Google product**
+A Flutter ported library to detect suspicious apps like Magisk manager, Xposed framework, Abnormal Environment, running emulator and much more. Written in Kotlin and Dart ❤️ **This is not an officially supported Google product**
 
 |   |   |   |   |
 |---|---|---|---|
@@ -22,13 +20,11 @@ A Flutter ported library to detect suspicious apps like Magisk manager, Xposed f
 
 - Check if the app is running on an emulator like Genymotion, Bluestacks, Windows subsystem for android, etc.
 
+> Note: This feature is not 100% accurate. but it is more accurate than the other libraries like [device_info_plus](https://pub.dev/packages/device_info_plus) or [safe_device](https://pub.dev/packages/safe_device).
+
 - Check if the Xposed framework is installed.
 
 - [Play Integrity API](https://developer.android.com/google/play/integrity) Checker which helps protect your apps and games from potentially risky and fraudulent interactions, such as cheating and unauthorized access, allowing you to respond with appropriate actions to prevent attacks and reduce abuse.
-
-### Disclaimer
-
-This tool is intended to be used by individuals to make it easy to secure your app for a large extend and it is **NOT 100% bulletproof**.
 
 ### Credits
 
@@ -38,11 +34,19 @@ This tool is intended to be used by individuals to make it easy to secure your a
 
 - [1nikolas/play-integrity-checker-app](https://github.com/1nikolas/play-integrity-checker-app)
 
+- [fluttercommunity/device_info_plus](https://github.com/fluttercommunity/plus_plugins/tree/main/packages/device_info_plus/device_info_plus)
+
+- [ufukhawk/safe_device](https://github.com/ufukhawk/safe_device)
+
 ### Contribution
 
 Feel free to contribute to this project by creating issues or pull requests. Any help is appreciated ❤️. Check out the [CONTRIBUTING.md](./CONTRIBUTING.md) file for more info.
 
 > Contribution guide will be added soon.
+
+#### Disclaimer
+
+This tool is intended to be used by individuals to make it easy to secure your app for a large extend and it is **NOT 100% bulletproof**. If you are looking for a 100% secure solution, this is not the right tool for you. This tool is not intended to be used for any illegal or malicious activities. Use it only for good purposes. I am not responsible for any damage caused by this tool.
 
 #### License
 
