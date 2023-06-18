@@ -1,5 +1,5 @@
 name: applist_detector_flutter
-description: A new Flutter plugin project.
+description: A Flutter ported library to detect suspicious apps like Magisk manager, Xposed framework, Abnormal Environment, running emulator and much more.
 version: 0.0.1
 homepage: "https://github.com/AhmedAbouelkher/applist_detector_flutter"
 

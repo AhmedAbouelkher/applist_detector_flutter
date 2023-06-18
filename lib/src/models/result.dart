@@ -13,11 +13,7 @@ typedef Details = Map<String, DetectorResultType>;
 class DetectorResult {
   final DetectorResultType type;
   final Details details;
-  const DetectorResult({
-    required this.type,
-    required this.details,
-  });
-
+  const DetectorResult({required this.type, this.details = const {}});
   factory DetectorResult.fromMap(Map map) {
     return DetectorResult(
       type: _parseTypeString(map['type']),

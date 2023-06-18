@@ -4,13 +4,17 @@ A Flutter ported library to detect suspicious apps like Magisk manager, Xposed f
 
 |   |   |   |   |
 |---|---|---|---|
-| ![entire home screen](./screenshots/1.jpg) | ![displaying syscall file detection](./screenshots/2.jpg) | ![displaying pm Conventional apis](./screenshots/3.jpg)  | ![displaying emulator detection](./screenshots/4.jpg)  |
+| ![security tester app logo](./screenshots/1.jpg) | ![displaying syscall file detection](./screenshots/2.jpg) | ![displaying pm Conventional apis](./screenshots/3.jpg)  | ![displaying emulator detection](./screenshots/4.jpg)  |
 
 ## Platform Support
 
 | Android | iOS | MacOS | Web | Linux | Windows |
 | :-----: | :-: | :---: | :-: | :---: | :-----: |
 |   ✅    | ❌  |  ❌   | ❌  |  ❌   |   ❌    |
+
+|   | Security Tester |
+|---|---|
+| ![logo image](./screenshots/icon_512x512.png) | You can use our app [Security Tester](https://github.com/AhmedAbouelkher/security_tester) which is considered a direct UI implementation for this library.
 
 ## Features
 
@@ -25,6 +29,8 @@ A Flutter ported library to detect suspicious apps like Magisk manager, Xposed f
 - Check if the Xposed framework is installed.
 
 - [Play Integrity API](https://developer.android.com/google/play/integrity) Checker which helps protect your apps and games from potentially risky and fraudulent interactions, such as cheating and unauthorized access, allowing you to respond with appropriate actions to prevent attacks and reduce abuse.
+
+- And much more...
 
 ### Credits
 
@@ -41,8 +47,6 @@ A Flutter ported library to detect suspicious apps like Magisk manager, Xposed f
 ### Contribution
 
 Feel free to contribute to this project by creating issues or pull requests. Any help is appreciated ❤️. Check out the [CONTRIBUTING.md](./CONTRIBUTING.md) file for more info.
-
-> Contribution guide will be added soon.
 
 #### Disclaimer
 
