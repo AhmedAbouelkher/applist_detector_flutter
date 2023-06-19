@@ -12,9 +12,11 @@ A Flutter ported library to detect suspicious apps like Magisk manager, Xposed f
 | :-----: | :-: | :---: | :-: | :---: | :-----: |
 |   ✅    | ❌  |  ❌   | ❌  |  ❌   |   ❌    |
 
-|   | Security Tester |
+> Note: This library is only supported on Android for now. iOS, MacOS, Web, Linux, and Windows support will **NOT** be added soon.
+
+| Security Tester | |
 |---|---|
-| ![logo image](./screenshots/icon_512x512.png) | You can use our app [Security Tester](https://github.com/AhmedAbouelkher/security_tester) which is considered a direct UI implementation for this library.
+| <img src="./screenshots/icon_512x512.png" alt="app logo" style="max-height: 150px;"> | You can use our app [Security Tester](https://github.com/AhmedAbouelkher/security_tester) which is considered a direct UI implementation for this library.
 
 ## Features
 
