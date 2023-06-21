@@ -54,6 +54,12 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
                 return
             }
 
+
+            "xposed_framework" -> {
+                checkXposedFramework(call, result)
+                return
+            }
+
             "xposed_modules" -> {
                 checkXposedModules(call, result)
                 return
@@ -96,6 +102,11 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
 
             "integrity_api_check" -> {
                 integrityApiCheck(call, result)
+                return
+            }
+
+            "root_beer_check" -> {
+                rootBeerCheck(call, result)
                 return
             }
 
@@ -142,6 +153,21 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             result.error("FILE_DETECTION_FAILED", e.message, null)
         }
     }
+    private fun checkXposedFramework(call: MethodCall, result: Result) {
+        val detail = mutableListOf<Pair<String, IDetector.Result>>()
+        try {
+            val dtc = XPosedFramework(context)
+            val r = dtc.run(null, detail)
+
+            val data = HashMap<String, Any>()
+            data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
+            result.success(data)
+        } catch (e: Exception) {
+            result.error("XPOSED_DETECTION_FAILED", e.message, null)
+        }
+    }
+
 
     private fun checkXposedModules(call: MethodCall, result: Result) {
         val detail = mutableListOf<Pair<String, IDetector.Result>>()
@@ -155,14 +181,14 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             data["details"] = detail.toHashMap()
             result.success(data)
         } catch (e: Exception) {
-            result.error("XPOSED_DETECTION_FAILED", e.message, null)
+            result.error("XPOSED_MODULES_DETECTION_FAILED", e.message, null)
         }
     }
 
     private fun checkMagiskApp(result: Result) {
         val detail = mutableListOf<Pair<String, IDetector.Result>>()
         try {
-            val dtc = MagiskApp(context)
+            val dtc = MagiskApp(context, "stub-release.apk")
             val r = dtc.run(null, detail)
 
             val data = HashMap<String, Any>()
@@ -309,6 +335,21 @@ class ApplistDetectorFlutterPlugin : FlutterPlugin, MethodCallHandler {
             }
         } catch (e: Exception) {
             result.error("INTEGRITY_API_FAILED", e.message, null)
+        }
+    }
+
+    private fun rootBeerCheck(call: MethodCall, result: Result) {
+        val detail = mutableListOf<Pair<String, IDetector.Result>>()
+        try {
+            val rootBeer = RootBeerD(context)
+            val r = rootBeer.run(null, detail)
+
+            val data = HashMap<String, Any>()
+            data["type"] = r.toString()
+            data["details"] = detail.toHashMap()
+            result.success(data)
+        } catch (e: Exception) {
+            result.error("ROOT_BEER_CHECKS_FAILED", e.message, null)
         }
     }
 }

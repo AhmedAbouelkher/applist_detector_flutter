@@ -62,6 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
         buildWrapper("Syscall File Detection", process: () {
           return _plugin.fileDetection(useSysCall: true);
         }),
+        buildWrapper("Xposed Framework", process: () {
+          return _plugin.xposedFramework();
+        }),
         buildWrapper("Xposed Modules", process: () {
           return _plugin.xposedModules();
         }),
@@ -88,6 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
         }),
         buildWrapper("Running Emulator", process: () {
           return _plugin.emulatorCheck();
+        }),
+        buildWrapper("RootBear Checks", process: () {
+          return _plugin.checkRootBeer();
         }),
       ];
       results = await Future.wait(tests);
