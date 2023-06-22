@@ -47,6 +47,18 @@ class MethodChannelApplistDetectorFlutter
   }
 
   @override
+  Future<DetectorResult> xposedFramework() async {
+    final result = await methodChannel.invokeMethod<Map>('xposed_framework');
+    if (result == null) {
+      throw PlatformException(
+        code: "NULL_RESULT",
+        message: "Checking Xposed framework failed.",
+      );
+    }
+    return DetectorResult.fromMap(result);
+  }
+
+  @override
   Future<DetectorResult> xposedModules({bool lspatch = false}) async {
     final result = await methodChannel
         .invokeMethod<Map>('xposed_modules', {'lspatch': lspatch});
@@ -196,5 +208,17 @@ class MethodChannelApplistDetectorFlutter
     }
 
     return token;
+  }
+
+  @override
+  Future<DetectorResult> checkRootBeer() async {
+    final result = await methodChannel.invokeMethod<Map>('root_beer_check');
+    if (result == null) {
+      throw PlatformException(
+        code: "NULL_RESULT",
+        message: "Checking rootbeer failed.",
+      );
+    }
+    return DetectorResult.fromMap(result);
   }
 }

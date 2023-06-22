@@ -10,7 +10,7 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 
-class MagiskApp(context: Context) : IDetector(context) {
+class MagiskApp(context: Context, private val stubPath: String) : IDetector(context) {
 
     override val name = "Magisk App"
 
@@ -20,8 +20,8 @@ class MagiskApp(context: Context) : IDetector(context) {
             PackageManager.GET_PERMISSIONS
 
     private val stubInfo by lazy {
-        val archive = context.cacheDir.resolve("stub-release.apk")
-        context.assets.open("stub-release.apk").use { input ->
+        val archive = context.cacheDir.resolve(stubPath)
+        context.assets.open(stubPath).use { input ->
             archive.outputStream().use { output ->
                 input.copyTo(output)
             }
@@ -33,11 +33,13 @@ class MagiskApp(context: Context) : IDetector(context) {
     override fun run(packages: Collection<String>?, detail: Detail?): Result {
         if (packages != null) throw IllegalArgumentException("packages should be null")
 
+        if(stubPath.isBlank() || stubPath.isEmpty()) {
+            throw IllegalArgumentException("SubPath is empty or blank")
+        }
+
         var result = Result.NOT_FOUND
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN)
-
-        Log.e("MagiskApp", stubInfo.packageName)
 
         for (pkg in pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)) {
             runCatching {

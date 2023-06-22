@@ -16,6 +16,10 @@ class ApplistDetectorFlutter {
     );
   }
 
+  Future<DetectorResult> xposedFramework() async {
+    return ApplistDetectorFlutterPlatform.instance.xposedFramework();
+  }
+
   Future<DetectorResult> xposedModules({bool lspatch = false}) async {
     return ApplistDetectorFlutterPlatform.instance
         .xposedModules(lspatch: lspatch);
@@ -57,5 +61,9 @@ class ApplistDetectorFlutter {
 
   Future<String> checkPlayIntegrityApi(String nonce) {
     return ApplistDetectorFlutterPlatform.instance.checkPlayIntegrityApi(nonce);
+  }
+
+  Future<DetectorResult> checkRootBeer() {
+    return ApplistDetectorFlutterPlatform.instance.checkRootBeer();
   }
 }

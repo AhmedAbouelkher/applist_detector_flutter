@@ -56,6 +56,10 @@ abstract class ApplistDetectorFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('fileDetection() has not been implemented.');
   }
 
+  Future<DetectorResult> xposedFramework() {
+    throw UnimplementedError('xposedFramework() has not been implemented.');
+  }
+
   Future<DetectorResult> xposedModules({bool lspatch = false}) {
     throw UnimplementedError('xposedModules() has not been implemented.');
   }
@@ -76,5 +80,9 @@ abstract class ApplistDetectorFlutterPlatform extends PlatformInterface {
   Future<String> checkPlayIntegrityApi(String nonce) {
     throw UnimplementedError(
         'checkPlayIntegrityApi() has not been implemented.');
+  }
+
+  Future<DetectorResult> checkRootBeer() {
+    throw UnimplementedError('checkRootBeer() has not been implemented.');
   }
 }
